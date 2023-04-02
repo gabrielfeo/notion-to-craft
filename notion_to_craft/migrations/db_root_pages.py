@@ -48,13 +48,19 @@ def build_child_links(database_path: Path, child_names: list[str]) -> list[str]:
     child_files = [p for p in database_path.glob('*') if p.is_file()]
     child_links = []
     for child_name in child_names:
-        matching_pages = [f.name for f in child_files
-                          if f.name.startswith(child_name)]
-        assert len(matching_pages) == 1
-        relative = database_path.relative_to(parent_dir) / matching_pages[0]
+        child_page = find_child_file(child_name, database_path, child_files)
+        relative = database_path.relative_to(parent_dir) / child_page
         relative_encoded = urllib.parse.quote(str(relative))
         child_links.append(f"[{child_name}]({relative_encoded})")
     return child_links
+
+
+def find_child_file(child_name, database_path, child_files) -> Path:
+    matches = [f.name for f in child_files if f.name.startswith(child_name)]
+    if len(matches) != 1:
+        msg = f"Expected 1 '{child_name}', found {len(matches)} in '{database_path}'"
+        raise RuntimeError(msg)
+    return matches[0]
 
 
 def write_database_page(database_path: Path, child_links: list[str]):
