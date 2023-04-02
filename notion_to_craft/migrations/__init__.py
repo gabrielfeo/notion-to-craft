@@ -1,1 +1,2 @@
 from .db_root_pages import migrate_db_root_pages
+from .titles_with_slashes import migrate_titles_with_slashes
